@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/proposal")
+@RequestMapping("/proposals")
 public class ProposalController {
 
     private ProposalService proposalService;
