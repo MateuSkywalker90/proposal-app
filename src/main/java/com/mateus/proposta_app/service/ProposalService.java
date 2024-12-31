@@ -8,6 +8,8 @@ import com.mateus.proposta_app.repository.ProposalRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Service
 public class ProposalService {
@@ -16,7 +18,11 @@ public class ProposalService {
 
     public ProposalResponseDto create(ProposalRequestDto requestDto) {
         Proposals proposals = ProposalMapper.INSTANCE.proposalToDto(requestDto);
-        proposalRepository.save(proposals);
-        return ProposalMapper.INSTANCE.convertEntityToDto(proposals);
+        Proposals savedProposals = proposalRepository.save(proposals);
+        return ProposalMapper.INSTANCE.convertEntityToDto(savedProposals);
+    }
+
+    public List<ProposalResponseDto> getProposal() {
+        return ProposalMapper.INSTANCE.convertListEntityToListDto(proposalRepository.findAll());
     }
 }

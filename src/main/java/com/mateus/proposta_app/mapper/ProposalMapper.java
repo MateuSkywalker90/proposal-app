@@ -2,31 +2,42 @@ package com.mateus.proposta_app.mapper;
 
 import com.mateus.proposta_app.dto.ProposalRequestDto;
 import com.mateus.proposta_app.dto.ProposalResponseDto;
+
 import com.mateus.proposta_app.entity.Proposals;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+import java.text.NumberFormat;
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface ProposalMapper {
 
     ProposalMapper INSTANCE = Mappers.getMapper(ProposalMapper.class);
 
-    @Mapping(target = "users.firstName", source = "firstName")
-    @Mapping(target = "users.lastName", source = "lastName")
-    @Mapping(target = "users.cpf", source = "cpf")
-    @Mapping(target = "users.phone", source = "phone")
-    @Mapping(target = "users.income", source = "income")
+    @Mapping(target = "usuario.nome", source = "nome")
+    @Mapping(target = "usuario.sobrenome", source = "sobrenome")
+    @Mapping(target = "usuario.cpf", source = "cpf")
+    @Mapping(target = "usuario.telefone", source = "telefone")
+    @Mapping(target = "usuario.renda", source = "renda")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "approved", ignore = true)
-    @Mapping(target = "integrated", ignore = true)
-    @Mapping(target = "observation", ignore = true)
+    @Mapping(target = "aprovada", ignore = true)
+    @Mapping(target = "integrada", ignore = true)
+    @Mapping(target = "observacao", ignore = true)
     Proposals proposalToDto(ProposalRequestDto proposalRequestDto);
 
-    @Mapping(target = "firstName", source = "users.firstName")
-    @Mapping(target = "lastName", source = "users.lastName")
-    @Mapping(target = "cpf", source = "users.cpf")
-    @Mapping(target = "phone", source = "users.phone")
-    @Mapping(target = "income", source = "users.income")
+    @Mapping(target = "nome", source = "usuario.nome")
+    @Mapping(target = "sobrenome", source = "usuario.sobrenome")
+    @Mapping(target = "cpf", source = "usuario.cpf")
+    @Mapping(target = "telefone", source = "usuario.telefone")
+    @Mapping(target = "renda", source = "usuario.renda")
+    @Mapping(target = "valorSolicitadoFmt", expression = "java(setRequestedAmountFmt(proposals))")
     ProposalResponseDto convertEntityToDto(Proposals proposals);
+
+    List<ProposalResponseDto> convertListEntityToListDto(Iterable<Proposals> proposals);
+
+    default String setRequestedAmountFmt(Proposals proposals) {
+        return NumberFormat.getCurrencyInstance().format(proposals.getValorSolicitado());
+    }
 }

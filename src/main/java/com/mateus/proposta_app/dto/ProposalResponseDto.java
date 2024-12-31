@@ -13,21 +13,21 @@ public class ProposalResponseDto {
 
     private Long id;
 
-    private String firstName;
+    private String nome;
 
-    private String lastName;
+    private String sobrenome;
 
     private String cpf;
 
-    private String phone;
+    private String telefone;
 
-    private Double income;
+    private Double renda;
 
-    private Double requestedAmount;
+    private String valorSolicitadoFmt;
 
-    private int paymentTerm;
+    private int prazoPagamento;
 
-    private Boolean approved;
+    private Boolean aprovada;
 
-    private String observation;
+    private String observacao;
 }

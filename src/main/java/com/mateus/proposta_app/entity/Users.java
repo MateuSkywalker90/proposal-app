@@ -23,17 +23,17 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName;
+    private String nome;
 
-    private String lastName;
+    private String sobrenome;
 
     private String cpf;
 
-    private String phone;
+    private String telefone;
 
-    private Double income;
+    private Double renda;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "usuario")
     private Proposals proposals;
 
     @Override

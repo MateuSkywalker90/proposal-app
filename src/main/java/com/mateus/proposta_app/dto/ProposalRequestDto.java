@@ -11,17 +11,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProposalRequestDto {
 
-    private String firstName;
+    private String nome;
 
-    private String lastName;
+    private String sobrenome;
 
     private String cpf;
 
-    private String phone;
+    private String telefone;
 
-    private Double income;
+    private Double renda;
 
-    private Double requestedAmount;
+    private Double valorSolicitado;
 
-    private int paymentTerm;
+    private int prazoPagamento;
 }

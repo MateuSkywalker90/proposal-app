@@ -25,19 +25,19 @@ public class Proposals {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double requestedAmount;
+    private Double valorSolicitado;
 
-    private int paymentTerm;
+    private int prazoPagamento;
 
-    private Boolean approved;
+    private Boolean aprovada;
 
-    private boolean integrated;
+    private boolean integrada;
 
-    private String observation;
+    private String observacao;
 
     @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "id_users")
-    private Users users;
+    @JoinColumn(name = "id_user")
+    private Users usuario;
 
     @Override
     public boolean equals(Object o) {
