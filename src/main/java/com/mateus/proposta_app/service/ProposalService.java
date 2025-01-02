@@ -13,11 +13,11 @@ import java.util.List;
 @Service
 public class ProposalService {
 
-    private ProposalRepository proposalRepository;
+    private final ProposalRepository proposalRepository;
 
-    private NotificationRabbitService notificationService;
+    private final NotificationRabbitService notificationService;
 
-    private String exchange;
+    private final String exchange;
 
     public ProposalService(ProposalRepository proposalRepository,
                            NotificationRabbitService notificationRabbitService,
@@ -40,7 +40,7 @@ public class ProposalService {
         try {
             notificationService.notify(proposals, exchange);
         } catch (RuntimeException e) {
-            proposals.setIntegrada(false);
+            //proposals.setIntegrada(false);
             proposalRepository.save(proposals);
         }
 

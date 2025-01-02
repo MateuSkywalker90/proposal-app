@@ -1,5 +1,6 @@
 package com.mateus.proposta_app.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,7 @@ public class Proposals {
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_user")
+    @JsonManagedReference
     private Users usuario;
 
     @Override
