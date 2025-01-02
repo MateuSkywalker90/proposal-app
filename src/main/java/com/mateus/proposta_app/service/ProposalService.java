@@ -6,11 +6,11 @@ import com.mateus.proposta_app.entity.Proposals;
 import com.mateus.proposta_app.mapper.ProposalMapper;
 import com.mateus.proposta_app.repository.ProposalRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Service
 public class ProposalService {
 
@@ -18,12 +18,22 @@ public class ProposalService {
 
     private NotificationService notificationService;
 
+    private String exchange;
+
+    public ProposalService(ProposalRepository proposalRepository,
+                           NotificationService notificationService,
+                           @Value("${rabbitmq.pendingproposal.exchange}") String exchange) {
+        this.proposalRepository = proposalRepository;
+        this.notificationService = notificationService;
+        this.exchange = exchange;
+    }
+
     public ProposalResponseDto create(ProposalRequestDto requestDto) {
         Proposals proposals = ProposalMapper.INSTANCE.proposalToDto(requestDto);
         Proposals savedProposals = proposalRepository.save(proposals);
 
         ProposalResponseDto responseDto = ProposalMapper.INSTANCE.convertEntityToDto(savedProposals);
-        notificationService.notify(responseDto, "proposta-pendente.ex");
+        notificationService.notify(responseDto, exchange);
 
         return responseDto;
     }
