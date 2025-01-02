@@ -5,7 +5,6 @@ import com.mateus.proposta_app.dto.ProposalResponseDto;
 import com.mateus.proposta_app.entity.Proposals;
 import com.mateus.proposta_app.mapper.ProposalMapper;
 import com.mateus.proposta_app.repository.ProposalRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +15,15 @@ public class ProposalService {
 
     private ProposalRepository proposalRepository;
 
-    private NotificationService notificationService;
+    private NotificationRabbitService notificationService;
 
     private String exchange;
 
     public ProposalService(ProposalRepository proposalRepository,
-                           NotificationService notificationService,
+                           NotificationRabbitService notificationRabbitService,
                            @Value("${rabbitmq.pendingproposal.exchange}") String exchange) {
         this.proposalRepository = proposalRepository;
-        this.notificationService = notificationService;
+        this.notificationService = notificationRabbitService;
         this.exchange = exchange;
     }
 
