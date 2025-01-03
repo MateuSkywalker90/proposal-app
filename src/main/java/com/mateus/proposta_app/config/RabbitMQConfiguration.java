@@ -15,7 +15,10 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfiguration {
 
     @Value("${rabbitmq.pendingproposal.exchange}")
-    private String exchange;
+    private String exchangePendingProposal;
+
+    @Value("${rabbitmq.concludedproposal.exchange}")
+    private String exchangeConcludedProposal;
 
     @Bean
     public Queue createQueuePendingCreditAnalysis() {
@@ -49,7 +52,12 @@ public class RabbitMQConfiguration {
 
     @Bean
     public FanoutExchange createFanoutExchangePendingProposal() {
-        return ExchangeBuilder.fanoutExchange(exchange).build();
+        return ExchangeBuilder.fanoutExchange(exchangePendingProposal).build();
+    }
+
+    @Bean
+    public FanoutExchange createFanoutExchangeConcludedProposal() {
+        return ExchangeBuilder.fanoutExchange(exchangeConcludedProposal).build();
     }
 
     @Bean
@@ -62,6 +70,18 @@ public class RabbitMQConfiguration {
     public Binding createBindingPendingNotification() {
         return BindingBuilder.bind(createQueuePendingNotification())
                 .to(createFanoutExchangePendingProposal());
+    }
+
+    @Bean
+    public Binding createBindingConcludedCreditAnalysis() {
+        return BindingBuilder.bind(createQueueConcludedProposal())
+                .to(createFanoutExchangeConcludedProposal());
+    }
+
+    @Bean
+    public Binding createBindingConcludedNotification() {
+        return BindingBuilder.bind(createQueueConcludedNotification())
+                .to(createFanoutExchangeConcludedProposal());
     }
 
     @Bean
