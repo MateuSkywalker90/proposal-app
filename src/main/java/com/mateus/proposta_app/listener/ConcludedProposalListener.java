@@ -1,17 +1,24 @@
 package com.mateus.proposta_app.listener;
 
+import com.mateus.proposta_app.dto.ProposalResponseDto;
 import com.mateus.proposta_app.entity.Proposals;
+import com.mateus.proposta_app.mapper.ProposalMapper;
 import com.mateus.proposta_app.repository.ProposalRepository;
+import com.mateus.proposta_app.service.WebSocketService;
+import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 
+@AllArgsConstructor
 public class ConcludedProposalListener {
 
-    @Autowired
     private ProposalRepository proposalRepository;
+
+    private WebSocketService webSocketService;
 
     @RabbitListener(queues = "${rabbitmq.queue.concluded.proposal}")
     public void concludedProposal(Proposals proposals) {
         proposalRepository.save(proposals);
+        ProposalResponseDto responseDto = ProposalMapper.INSTANCE.convertEntityToDto(proposals);
+        webSocketService.notify(responseDto);
     }
 }
