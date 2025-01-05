@@ -1,0 +1,16 @@
+version: '3.5'
+services:
+  proposal-app:
+    image: proposal-app
+    environment:
+      spring.profiles.active: prod
+    depends_on:
+      - rabbit-mq
+      - db
+  rabbit-mq:
+    image: rabbitmq:3-management
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: proposaldb
