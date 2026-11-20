@@ -14,8 +14,6 @@ This repository is the **proposal service** — the entry point of the system. I
 | [credit-analysis-microservice](https://github.com/MateuSkywalker90/credit-analysis-microservice) | Consumes pending proposals and decides approval |
 | [notification-microservice](https://github.com/MateuSkywalker90/notification-microservice) | Consumes proposal events and sends SMS notifications through AWS SNS |
 
-> [Built while studying event-driven microservices with Spring Boot and RabbitMQ — based on the course "<course name>". ← keep this line only if it applies; delete otherwise]
-
 ## Architecture
 
 ```mermaid
