@@ -5,6 +5,8 @@ import com.mateus.proposta_app.dto.ProposalResponseDto;
 import com.mateus.proposta_app.entity.Proposals;
 import com.mateus.proposta_app.mapper.ProposalMapper;
 import com.mateus.proposta_app.repository.ProposalRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class ProposalService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProposalService.class);
 
     private final ProposalRepository proposalRepository;
 
@@ -28,22 +32,26 @@ public class ProposalService {
     }
 
     public ProposalResponseDto create(ProposalRequestDto requestDto) {
-        Proposals proposals = ProposalMapper.INSTANCE.proposalToDto(requestDto);
-        Proposals savedProposals = proposalRepository.save(proposals);
+        // New proposals start as not integrated (see ProposalMapper). They are only
+        // marked as integrated after the event is successfully published, so a failed
+        // publish is picked up and retried by ProposalWithoutIntegration.
+        Proposals proposal = ProposalMapper.INSTANCE.proposalToDto(requestDto);
+        Proposals savedProposal = proposalRepository.save(proposal);
 
-        notificationRabbitMQ(proposals);
+        publishPendingProposal(savedProposal);
 
-        return ProposalMapper.INSTANCE.convertEntityToDto(savedProposals);
+        return ProposalMapper.INSTANCE.convertEntityToDto(savedProposal);
     }
 
-    private void notificationRabbitMQ(Proposals proposals) {
+    private void publishPendingProposal(Proposals proposal) {
         try {
-            notificationService.notify(proposals, exchange);
+            notificationService.notify(proposal, exchange);
+            proposal.setIntegrada(true);
+            proposalRepository.save(proposal);
         } catch (RuntimeException e) {
-            //proposals.setIntegrada(false);
-            proposalRepository.save(proposals);
+            logger.warn("Could not publish proposal {}; it will be retried by the scheduler: {}",
+                    proposal.getId(), e.getMessage());
         }
-
     }
 
     public List<ProposalResponseDto> getProposal() {

@@ -1,9 +1,12 @@
-FROM  openjdk:17
+FROM eclipse-temurin:17-jre
 
-COPY target/proposal-app-1.0.0.jar proposal-app-1.0.0.jar
+WORKDIR /app
+
+# Matches the jar produced by `./mvnw package` regardless of the project version
+COPY target/proposal-app-*.jar app.jar
 
 COPY wait-for-it.sh wait-for-it.sh
 
 RUN chmod +x wait-for-it.sh
 
-ENTRYPOINT ["./wait-for-it.sh", "rabbit-mq:5672", "--", "java", "-Duser.language=pt", "-Duser.country=BR", "-jar", "proposal-app-1.0.0.jar"]
+ENTRYPOINT ["./wait-for-it.sh", "rabbit-mq:5672", "--", "java", "-Duser.language=pt", "-Duser.country=BR", "-jar", "app.jar"]
