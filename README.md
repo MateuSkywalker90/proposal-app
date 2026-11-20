@@ -20,27 +20,27 @@ This repository is the **proposal service** — the entry point of the system. I
 
 ```mermaid
 flowchart LR
-    FE[Frontend] -->|POST /proposta| PA[proposal-app]
+    FE[Frontend] -->|POST /proposals| PA[proposal-app]
     PA --> DB[(PostgreSQL)]
-    PA -->|publish| EX1{{proposta-pendente.ex<br/>fanout}}
-    EX1 --> Q1[ms-analise-credito queue]
-    EX1 --> Q2[ms-notificacao queue]
+    PA -->|publish| EX1{{pending-proposal.ex<br/>fanout}}
+    EX1 --> Q1[ms-credit-analysis queue]
+    EX1 --> Q2[ms-notification queue]
     Q1 --> CA[credit-analysis-microservice]
     Q2 --> NS[notification-microservice]
-    CA -->|publish result| EX2{{proposta-concluida.ex<br/>fanout}}
-    EX2 --> Q3[ms-proposta queue]
-    EX2 --> Q4[ms-notificacao queue]
+    CA -->|publish result| EX2{{concluded-proposal.ex<br/>fanout}}
+    EX2 --> Q3[ms-proposal queue]
+    EX2 --> Q4[ms-notification queue]
     Q3 --> PA
     Q4 --> NS
     NS -->|SMS| SNS[AWS SNS]
-    PA -->|WebSocket /propostas| FE
+    PA -->|WebSocket /proposals| FE
 ```
 
 ### Design decisions
 
 - **Asynchronous messaging instead of REST calls between services.** The proposal service doesn't wait for credit analysis. If the analysis service is slow or down, proposals are still accepted and processed when it comes back.
 - **Fanout exchanges.** One event reaches several consumers (credit analysis *and* notification) without the producer knowing who they are. Adding a new consumer means adding a queue, not changing this service.
-- **No lost proposals when the broker is down.** A proposal is saved with `integrada = false` and only marked `true` after its event is successfully published. If RabbitMQ is unavailable, the API still accepts the proposal, and a scheduled job republishes pending ones every 10 seconds.
+- **No lost proposals when the broker is down.** A proposal is saved with `integrated = false` and only marked `true` after its event is successfully published. If RabbitMQ is unavailable, the API still accepts the proposal, and a scheduled job republishes pending ones every 10 seconds.
 - **Real-time results.** When the analysis result arrives, it's pushed to the frontend over WebSocket (STOMP) instead of making the client poll.
 
 ## Tech stack
@@ -51,27 +51,27 @@ Java 17 · Spring Boot 3.4 (Web, Data JPA, AMQP, WebSocket) · RabbitMQ · Postg
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/proposta` | Create a proposal |
-| `GET` | `/proposta` | List all proposals |
+| `POST` | `/proposals` | Create a proposal |
+| `GET` | `/proposals` | List all proposals |
 
-WebSocket topic: `/propostas` — receives a proposal when its analysis is concluded.
+WebSocket topic: `/proposals` (STOMP endpoint `/ws`) — receives a proposal when its analysis is concluded.
 
 Example request:
 
 ```json
-POST /proposta
+POST /proposals
 {
-  "valorSolicitado": 10000.0,
-  "prazoPagamento": 24,
-  "nome": "Maria",
-  "sobrenome": "Silva",
+  "requestedAmount": 10000.0,
+  "paymentTerm": 24,
+  "firstName": "Maria",
+  "lastName": "Silva",
   "cpf": "000.000.000-00",
-  "telefone": "+5592999999999",
-  "renda": 5000.0
+  "phone": "+5592999999999",
+  "income": 5000.0
 }
 ```
 
-> Field names are in Portuguese (`valorSolicitado` = requested amount, `prazoPagamento` = payment term in months).
+> `paymentTerm` is in months. `cpf` is the Brazilian individual taxpayer ID.
 
 ## Running locally
 
@@ -85,7 +85,7 @@ POST /proposta
 docker compose up -d --build
 ```
 
-- API: http://localhost:8080/proposta
+- API: http://localhost:8080/proposals
 - RabbitMQ management UI: http://localhost:15672 (guest / guest)
 
 To run the full flow, also start `credit-analysis-microservice` and `notification-microservice` against the same RabbitMQ.

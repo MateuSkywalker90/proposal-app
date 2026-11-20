@@ -11,8 +11,8 @@
 	<groupId>com.mateus</groupId>
 	<artifactId>proposal-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>proposta-app</name>
-	<description>Microservico resposavel pelo cadastro das propostas</description>
+	<name>proposal-app</name>
+	<description>Microservice responsible for registering credit proposals</description>
 	<url/>
 	<licenses>
 		<license/>
